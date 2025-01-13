@@ -1,0 +1,536 @@
+% This is samplepaper.tex, a sample chapter demonstrating the
+% LLNCS macro package for Springer Computer Science proceedings;
+% Version 2.21 of 2022/01/12
+%
+\documentclass[runningheads]{llncs}
+%
+% \usepackage[T1]{fontenc}
+\usepackage{newtxtext}
+\usepackage[utf8]{inputenc}
+% T1 fonts will be used to generate the final print and online PDFs,
+% so please use T1 fonts in your manuscript whenever possible.
+% Other font encondings may result in incorrect characters.
+%
+\usepackage[bookmarks=true,bookmarksdepth=2,
+colorlinks=true,
+linkcolor=blue,
+citecolor=blue,      % color of links to bibliography
+filecolor=blue,      % color of file links
+urlcolor=blue
+% add numbering to bookmarks
+,bookmarksnumbered=true
+]{hyperref}
+\usepackage{adjustbox}
+\usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage[table]{xcolor}
+\usepackage{amsmath}
+\usepackage{multicol}
+% \usepackage{geometry}
+% \geometry{left=1in, right=1in, top=1in, bottom=1in}
+\usepackage{titlesec}
+\titlespacing*{\subsection}{2pt}{2pt}{2pt}
+\titlespacing*{\subsubsection}{2pt}{2pt}{2pt}
+\titlespacing*{\itemsize}{2pt}{2pt}{2pt}
+
+
+
+\setlength{\textfloatsep}{10pt plus 2pt minus 4pt} % Space between floats and text
+\setlength{\floatsep}{10pt plus 2pt minus 4pt} % Space between floats
+\setlength{\intextsep}{10pt plus 2pt minus 4pt} % Space between text and floats
+
+\input{header-codelisting}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\usepackage{graphicx}
+
+% table column specificatin
+\usepackage{array}
+
+% end theorem
+
+\begin{document}
+
+\title{Bridging the Domain Language Divide in Automatic Multiplatform Single Page Application Generation with Knowledge Graph}
+%
+%\titlerunning{Abbreviated paper title}
+% If the paper title is too long for the running head, you can set
+% an abbreviated paper title here
+%
+\author{
+Le Yen Chi Pham \inst{1} \and 
+Van Cong Nguyen \inst{2} \and
+Minh Khue Hoang \inst{2} \and 
+Dang Duc Anh Nguyen \inst{2} \and 
+Quang Tung Ta\inst{2} \and 
+Duc Minh Le \inst{2}
+}
+
+\authorrunning{L. Y. C. Pham et al.}
+\titlerunning{Bridging Domain Language Divide in Multiplatform SPA Generation with KG}
+% First names are abbreviated in the running head.
+% If there are more than two authors, 'et al.' is used.
+%
+\institute{Swinburne University of Technology, Hawthorn, Victoria, Australia \email{chiphamleyen@gmail.com} \and Department of Information Technology, FPT University,
+Swinburne Vietnam, Hanoi, Vietnam
+\email{\{congnv24,duclm20\}@fe.edu.vn, \{khuehmswh00983,anhnddswh01109, tungtqswh01093\}@fpt.edu.vn}}
+%
+\maketitle              % typeset the header of the contribution
+%
+\begin{abstract}
+Automating the software development process has long been a central topic in software engineering. The advent of modern AI methods and tools, especially the recent rapid advancement of generative AI has brought renewed research interests in the automation capability. A main limitation of the current AI-based approaches is that they are only able to generate code fragments and not the complete software module. Our recent works have proposed a novel software generation solution for a popular type of web frontend application, named single page application (SPA). Our works use annotation-based domain specific languages (aDSLs) to express the SPA design specification and code generators to automatically generate complete SPA software modules. However, our works currently lack the ability to express the SPA specifications in higher-level languages, necessary to leverage the AI methods and tools. In this paper, we aim to make a first novel step in bridging this gap by using knowledge graph to express the SPA specification, bringing it closer to the domain expert languages. We construct the knowledge graph model and implement it in a Java software framework, named JDA. After that, we develop an algorithm named SPKGen to generate aDSL-based SPA specification from the knowledge graph model. Subsequently, we evaluate the effectiveness of the knowledge graph model against real-world SPA case studies. We assess the knowledge graph model's ability to accurately represent the configurations of SPA. Further, we evaluate the effectiveness of our method in generating the SPA components and configurations from the knowledge graph. The results of these evaluations demonstrate the viability of using knowledge graph for capturing and realizing SPA.
+
+
+\keywords{Knowledge graph, Domain-Driven-Design, Generative software development, Single Page Application.}
+\end{abstract}
+%
+%
+%
+\section{Introduction}
+
+Domain-Driven Design (DDD) provides principles and practices for building complex software systems from a core domain model \cite{evans_domain-driven_2004}. Generative programming techniques, such as code generation and metaprogramming, can help automate software development for these complex applications \cite{czarnecki_generative_2002}. Additionally, Domain-Specific Languages (DSLs) allow for the creation of languages tailored to specific problem domains, which can be beneficial for automating the development of Single Page Applications (SPAs) \cite{fowler_domain-specific_2010}. Our previous work has proposed a novel method to automatically generate frontend applications for multiple SPA frameworks using annotation-based DSLs (aDSLs) and code generators implemented in the JDA framework \cite{le_jdomainapp_2019,le_generating_2022,le_modularly_2024}. However, a key limitation of our work is the lack of a formal mapping between the aDSL specifications and higher-level design models, such as those expressed in UML or knowledge graphs \cite{omg2017uml} \cite{wang_application_2023}. Although knowledge graph has been used in software development in general, to the best of our knowledge, there have been no work researching the application of knowledge graph to SPA. This paper aims to bridge this gap by using knowledge graph to formally express the aDSL-based SPA specifications. Specifically, we propose a  knowledge-graph-based language, named Software Configuration Graph Language (SCGL), for representing both the metamodel and model elements of SPA specification. To ease SPA application in SCGL, we define an algorithm named SPKGen, which transforms a software configuration graph, expressed in SCGL, into a software configuration class model. This model is used as input in our JDA framework to automatically generate SPAs \cite{le_generating_2022,le_modularly_2024}. We evaluate the performance of SPKGen and the effectiveness of SCGL for expressing SPAs.
+
+The rest of this paper is structured as follows. In section \ref{section2}, we provide an overview of the relevant concepts and prior research that serve as the foundation for this work. This includes a discussion of SCCL* and its role in modeling SPAs. The section then mention a framework we proposed that was developed to generate SPA from the configuration. Section \ref{section3} introduces the SCGL and describes how it can be used to formally model the structural and components of SPA. We explain the key constructs and relationships defined in the SCGL and demonstrate its ability to capture the same information as the SCCL*. Section \ref{section4} presents the SPKGen algorithm, which is responsible for automatically generating the SCCL* representation from an SCGL model. We describe the detailed steps of the SPKGen algorithm and discuss how it ensures the faithful translation of the SCGL model into the SCCL* constructs. In section \ref{section5}, we assess the effectiveness of the SCGL model and the SPKGen algorithm using the "CourseMan" example as a benchmark. This includes validating the SCGL model's ability to accurately capture the configurations of the SPA, as well as evaluating the SPKGen algorithm's and knowledge graph's effectiveness in generating software application as the original counterpart. Finally, section \ref{section6} concludes the paper and outlines potential future research directions.
+
+%\vspace{-0.5cm}
+\section{Background and Related Works} \label{section2}
+\vspace{-0.2cm}
+
+Our work presented in this paper lies at the interactions of these topic domains: (1) multiplatform SPA generation and (2) application of knowledge graph in the development of single page application (SPA). 
+
+\subsection{SCCL*: SPA Metamodel}
+In our previous work, we proposed a fundamental metamodel for SPAs which is expressed using an annotation-based DSL called SCCL* \cite{le_generating_2022}. This metamodel was derived from the requirements of four popular front-end frameworks: Angular, React, React Native, and Vue.js (referred to as the "ARNV" frameworks). The SPA metamodel describes the foundational architecture of SPAs, including key elements such as modules, components (main form, object form, object browser), routing, and backend communication.
+However, building SPAs using this metamodel remains complex, as modern front-end development often involves multiple visual components provided by third-party libraries, such as Bootstrap. To address this, we adopted a systematic approach that integrates front-end design patterns, allowing a more structured representation of visual components, whether custom-built or third-party. This approach streamlines development through code generation and automation.
+
+This paper uses the CourseMan software example from our previous work, focusing on six key classes: SCCCourseMan, ModuleStudent, ModuleCourse, ModuleAddress, and ModuleEnrolment, which represent entities in a course management system. To simplify, we will illustrate SCCCourseMan and ModuleStudent, as the other modules follow similar implementations. This example serves as a benchmark for evaluating the proposed SCGL model and SPKGen algorithm.
+
+\begin{multicols}{2}
+\begin{lstcodessm}{SCCCourseman (Source: \cite{le_generating_2022})}(@\hterm{@RestController}@)
+@SystemDesc(
+    appName="Courseman",
+    dsDesc = @DSDesc(
+        type="postgresql",
+        dsUrl = "http://dataserver:5432/courseman",
+        user = "admin", 
+        password = "password",
+        connType=Client
+    ),
+    modules = { 
+        ModuleMain.class, 
+        ModuleAdress.class, 
+        ModuleCourseModule.class, 
+        ModuleEnrolment.class, 
+        ModuleStudent.class 
+    }
+)
+public class SCCCourseMan { }
+\end{lstcodessm}
+
+\begin{lstcodessm}{Student Module (Source: \cite{le_generating_2022})}(@\hterm{@RestController}@)
+@ModuleDesc( name="Module: Student", 
+    model="Student", view=View.class, 
+    containmentTree = @CTree { 
+      root = "Student", 
+      edges = { 
+        @CEdge (p=Student.class, c=Address.class), 
+        @CEdge (p=Student.class, c= Enrolment.class) 
+    }})  
+class ModuleStudent { 
+    @AttributeDesc(label="Form: Student") 
+    private String title; 
+    @AttributeDesc(label="Id", type=JTextField.class) 
+    private int id; 
+    @AttributeDesc(label="Name", type=JTextField.class) 
+    private String name; 
+    @AttributeDesc(label="Gender", 
+    type=JComboField.class) 
+    private Gender gender; 
+    @AttributeDesc(label="Dob") 
+    private Date dob; 
+    @AttributeDesc(label="Address", type=JDataPanel.class) 
+    private Address address; 
+    @AttributeDesc(label="Form: Enrolment") 
+    private Collection <Enrolment> enrols; 
+}
+\end{lstcodessm}
+\end{multicols}
+
+Listing 1 demonstrates the SCCL* configuration for SCCCourseMan and its relationship with the various modules. Similarly, Listing 2 shows the SCCL* configuration for the Student module within the CourseMan software. These SCCL* configurations are written using Java's syntax.
+
+Figure 1 shows the SPA view of the Student module of the CourseMan application, which is generated from the SCCL* configuration using the React framework by the JDA framework introduced in our previous work \cite{le_generating_2022}.
+
+\begin{figure}
+\centering
+\includegraphics[width=6cm]{Figures/Figure1.eps}
+\caption{The Student module of CourseMan example in Reactjs (Source: \cite{le_generating_2022}).} 
+\end{figure}
+
+\subsection{JDA: Generating multiplatform SPAs from SCCL*}
+The SPA development process in this approach begins by creating an SPA model using the SCCL* language, supported by the JDA framework \cite{le_generating_2022}. This model is then input into the SPAGen code generator, a JDA module, which produces the actual SPA code based on the specified front-end platform.
+
+In our previous research \cite{le_generating_2022} \cite{le_modularly_2024}, we have proposed a method for automatically generating frontend applications across multiple frameworks. This approach utilizes a set of annotation-based DSLs (aDSLs) to express the SPA model. We then developed code generators in object-oriented programming languages (OOPLs) to parse the aDSL specifications and generate the corresponding frontend software. The aDSLs allow for the specification of the target frontend framework, such as Vue.js, React, or Angular. The code generators incorporate well-defined UI design patterns to improve the usability of the generated software. We have implemented our aDSLs and code generators within a Java software framework named JDA \cite{le_jdomainapp_2019} \cite{le_generating_2022}.
+
+However, a key limitation is the lack of a formal method to map the aDSL specifications to higher-level design models, such as those expressed in UML \cite{omg2017uml} or knowledge graphs \cite{wang_application_2023}. Establishing a formal mapping between the aDSL specifications and these higher-level design models could provide significant benefits. It would allow us to leverage the capabilities of our code generators not only for frontend software development.
+
+Knowledge graphs, in particular, offer a powerful way to represent and reason about the relationships and domain knowledge within software applications. Mapping aDSLs to a knowledge graph model would capture contextual information between components and business logic, improving code generation and enabling semantic queries. This formal mapping could also advance generative AI in software engineering. The next section discusses how knowledge graphs are applied in generating SPAs.
+
+\subsection{Knowledge Graph and Its Application in SPA Construction}
+A knowledge graph (KG) is a structured representation of knowledge, typically used to organize information in a machine-readable format. It is essentially a graph database that connects entities, concepts, and their relationships. In a knowledge graph, entities are represented as nodes, and the relationships between them are represented as edges \cite{fensel_introduction_2020}.
+
+Knowledge graphs have numerous applications, particularly in the field of Artificial Intelligence (AI). They facilitate tasks such as question answering, recommendation systems, and semantic search by organizing structured knowledge to enable efficient information retrieval and analysis, thereby enhancing various aspects of artificial intelligence \cite{ji_survey_2022}.
+
+By capturing and representing diverse types of knowledge and relationships, KGs can also be highly beneficial throughout the software development lifecycle \cite{wang_application_2023}: Requirements Engineering: modeling relationships between requirements and system components \cite{Kasser_2000}, Software Design and Architecture: visualizing architecture and dependencies \cite{ali_babar_software_2009}, Maintenance and Evolution: tracking changes and bug reports linked to code.
+
+Although KG has been quite extensively used in software engineering, to the best of our knowledge it has not been used to express the metamodel of aDSLs for frontend applications. Indeed, we used two keyword queries on Google Scholar to find the relevant articles. The first query aims to find specific articles on  KG for SPA development. The query is: "Knowledge Graph" AND (SPA OR "single page application") AND (generation OR construction OR development). We reviewed the first 200 results but none of these works actually discuss KG for SPA development or generation. These results only show works in either \textit{(i)} KG construction for domain-specific knowledge-base (e.g. tourism, procurement value chain, online tutoring assistant, question answering, etc.) or \textit{(ii)}  KG engineering (including automatic KG generation, visualisation, exploration and editing, query answering over KG, etc.). The second query extends the first to cover also frontend:  ``Knowledge Graph'' AND (SPA OR ``single page application'' OR ``frontend'' OR ``front end'') AND (generation OR construction OR development). We also reviewed the first 200 results. This second search returns a few additional articles concerning the general application of KG to software development (e.g. \cite{lin_intelligent_2017}). However, they do not discuss specifically frontend or SPA development.
+
+This paper presents our first important step in bridging the gap in application of KG to frontend development. More specifically,  we focus on aDSL-based software generation for multiplatform Single Page Applications (SPAs), by formally expressing the aDSL specification in a knowledge graph format. The goal is to leverage the capabilities of knowledge graphs to express SCCL* for the purpose of generating SPAs. This problem is formulated based on our recent work in multi-platform SPA generation using Object-Oriented Programming Languages (OOPLs). Resolving this issue will help lay a foundation for building a generative AI capability on top of our existing multiplatform code generators.
+
+\section{Representing SCCL* in SCGL} \label{section3}
+\vspace{-0.2cm}
+The existing Java-based SCCL* implementation was converted into a metamodel that supports the representation of the SPA configurations as a knowledge graph in the Neo4j database. We call the new metamodel \textbf{Software Configuration Graph Language (SCGL)} with the view that it can be reconstructed into SCCL* to generate the SPAs. The benefit of knowlege graph is that it helps represent both the underlying language model (a.k.a the metamodel) and its models in the same graph. A model represents a software model that is instantiated from the metamodel for a specific problem domain. Figure \ref{fig4} shows a diagram to visualize the design of SCGL using nodes and their relationships. Within the scope of this paper, we focus on the basic elements of SCCL* with the containment tree. 
+
+To express the SCCL* model in Neo4j, we implemented every detail of the SCCL* specification using Neo4j’s features, enabling a conceptual model within the knowledge graph. The key concepts and relationships supported by Java were mapped into Neo4j node and relationship types, creating the necessary node labels and relationship types to match the entities and associations defined in the metamodel. The full mapping of SCCL* classes to SCGL nodes is detailed in section \ref{section4}.
+
+This approach involves a hierarchical structure: Metamodel, Model, and Model Instance, where each level is an instance of the previous one. The Metamodel defines the design and constraints for the Model, which specifies the software configuration. The Model Instance represents the actual software setup, adhering to the structure outlined in the Model, which is based on the Metamodel. This structured method enables SPA generation from the defined Model Instance.
+
+Key relationships between entities, such as inheritance, composition, and annotation, correspond to Neo4j relationships like "INSTANCE\_OF," "HAS," and "ATTACH\_TO," preserving semantic connections and cardinality constraints. However, Neo4j does not natively support modeling with constraints, so we layered the graph design into three levels, each with specific rules to structure SCGL.
+
+The central entities in the metamodel were directly translated into node labels in Neo4j, ensuring an accurate representation of concepts and their taxonomic structure. For example, the SCCCourseMan node is an SCGL model for CourseMan. The target SPA configuration consists of a generation configuration (an instance of RFSGenDesc), a system configuration (an instance of SystemDesc), and module configurations, each represented by an instance of ModuleDescriptor with a data model.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=10cm]{Figures/scgl-courseman.jpg}
+\caption{SCGL structure and CourseMan example implementation.} 
+\label{fig4}
+\end{figure}
+
+\subsection{Annotation, Class, Attribute, and Method node types}
+These node types represent various Java elements in SCGL. The other nodes may have the "IS\_A" relationship with the element nodes to specify their type in Java. The Annotation nodes represent different types of Java annotations. They have an "IS\_A" relationship with the "Annotation" node. Examples of annotation type nodes include "RFSGenDesc", "SystemDesc", and others, each named after the specific annotation they represent. The Class nodes represent Java classes. These class nodes have an "IS\_A" relationship with the "Class" node.
+
+\subsection{Relationships}
+"ATTACH\_TO" relationship with a class node, indicating which class the annotation is attached to. In addition, "INSTANCE\_OF" relationship with an annotation type node, indicating the type of annotation.
+
+Depending on the type of annotation instance, there may be additional relationships:
+\begin{itemize}
+    \item "SystemDesc" annotation instances have one or more "HAS\_MODULE" relationships with module class nodes. For example, a "SystemDesc" for "SCCCourseMan" may have "ModuleMain", "ModuleStudent", etc.
+    \item "ModuleDescriptor" annotation instances have exactly one "HAS\_MODEL" relationship with a domain class node, indicating the domain model for that module. They also have a "HAS\_VIEW" relationship with a "ViewDesc" node and a "HAS\_CONTROLLER" relationship with a "ControllerDesc" node.
+\end{itemize}
+
+\subsection{Level 1: Metamodel}
+The Metamodel is the foundation of the SCGL, defining the overall structure and relationships of the concepts used to express the configuration of the software. This layer establishes the design and constraints for the subsequent levels.
+
+The Metamodel includes various classes such as SetupDesc, ModuleDesc, ViewDesc, ControllerDesc, DClass, and DAtrr, and their associations. These elements describe the different components and their interactions within the software application. The Metamodel provides the necessary framework to model the software configuration in a structured and consistent manner.
+
+\subsection{Level 2: Model}
+The Model is an instance of the Metamodel, conforming to the design and constraints established in the Metamodel layer. This layer represents the specific configuration of the software, including the various software components and their relationships.
+
+The Model includes classes like SCCCourseManGenDesc, SCCCourseManSystemDesc, ModuleStudentDescriptor, and Student Model. These classes and their associations define the specific entities and interactions involved in the software application, such as course management, module management, and student-related functionality.
+
+\subsection{Level 3: Model Instance}
+The Model Instance is an instance of the Model, representing the actual software configuration. This layer contains the specific instances of the Model classes, such as SCCCourseMan and ModuleStudent, adhering to the structure and constraints defined in the Model layer. Moreover, the Model Instance embodies the final software configuration, providing a tangible representation of the application's components and their relationships.
+
+\section{SPKGen: From SCGL to SCCL*} \label{section4}
+\vspace{-0.2cm}
+To ensure that the Neo4j knowledge graph schema aligns with SCCL*, we developed a method to query the graph and reconstruct the configurations as SCCL* in Java. This algorithm, called SPKGen (Knowledge-Graph-Based Single Page Application Generation), generates SPAs from a knowledge graph written in SCGL by transforming the graph into SCCL*. The transformed SCCL* is then used, along with the JDA framework, to generate the target SPA. In this paper, we focus on the essential elements of SCCL* supported by SCGL, with additional features planned for future work.
+
+\begin{algorithm}
+\caption{SPKGen Algorithm}
+\begin{adjustbox}{minipage=\textwidth, scale=0.65}
+\begin{algorithmic}[1]
+\Function{Extract\_Knowledgegraph}{KG\_Connection}
+    \State classNodes $\gets$ \texttt{queryClassNodes}(KG\_Connection)
+    \ForAll{classNode in classNodes}
+        \State className $\gets$ classNode.\texttt{getProperty}("name")
+        \State classPackage $\gets$ classNode.\texttt{getProperty}("package")
+        \State outputFilePath $\gets$ classPackage + className
+        \State path $\gets$ classPackage + className
+        \If{path $\neq$ null}
+            \State \texttt{copyFile}(path, outputFilePath)
+        \Else
+            \State \textbf{continue}
+        \EndIf
+        \State classModel $\gets$ \texttt{new ClassModel}()
+        \State classModel.name $\gets$ className
+        \State classModel.package $\gets$ classPackage
+        \State classModel.annotations $\gets$ \texttt{new List<string>}
+        \State annotationPairs $\gets$ \texttt{queryAnnotations}(knowledgeGraph, classNode)
+        \ForAll{(annotationNode, annotationTypeNode) in annotationPairs}
+            \State annotationTemplate $\gets$ \texttt{getAnnotationTemplate}(annotationTypeNode.name)
+            \State annotationModel $\gets$ \texttt{AnnotationModel.nodeToModel}(annotationNode, annotationTypeNode.name)
+            \State annotationBoundOutput $\gets$ \texttt{bind}(annotationTemplate, annotationModel)
+            \State classModel.annotations.\texttt{add}(annotationBoundOutput)
+            \State \texttt{writeToFile}(outputFilePath, \texttt{bind}(classTemplate, classModel))
+        \EndFor
+    \EndFor
+\EndFunction
+\end{algorithmic}
+\end{adjustbox}
+\end{algorithm}
+
+We used the Neo4j Java Driver to execute Cypher queries against the knowledge graph and retrieve the schema information. This allowed us to programmatically extract the node labels, relationship types, and their associated properties that represent the schema using our algorithm. The detailed description and the steps of SPKGen are as follow:
+
+\subsection{Query all class nodes from the knowledge graph}
+The algorithm starts by querying the knowledge graph to retrieve all the class nodes. This is done using a Cypher query like MATCH [n:CLASS]-[:IS\_A]->[e:JAVA\_ELEMENT {name: "Class"}] RETURN n.
+
+\subsection{Check each class node for the "path" property}
+For each class node retrieved in the previous step, the algorithm checks if the node has a "path" property. If the "path" property exists, it means this class will not be generated, but instead, it will be programmatically copied over to the output directory from the Java file indicated by the "path" property.  If the "path" property does not exist, the algorithm proceeds to the next step to generate this class.
+
+\subsection{Generate the classes}
+For each class node that needs to be generated (i.e., does not have the "path" property), the algorithm reads the class name from the node and puts it in a Freemarker template. It then queries the knowledge graph to retrieve the annotations and their corresponding annotation types associated with the class.
+
+For each pair of annotation and annotation type, the algorithm determines the right Freemarker template to use based on the annotation type. If the annotation type is "RFSGenDesc", the algorithm simply populates the corresponding template with information from the annotation node. If the annotation type is "SystemDesc", the algorithm queries for all classes with the relationship (this SystemDesc instance)-[:HAS\_MODULE]->(n:CLASS). The resulting array of ns will become the "modules" property of the annotation, and the other properties can be retrieved from the annotation node. If the annotation type is "ModuleDescriptor", the algorithm queries for the class with the relationship (this ModuleDescriptor instance)-[:HAS\_MODEL]->(n:CLASS). If the knowledge graph is correct, there should be only one n, which is a domain class. The name of this domain class will become part of the ModuleDescriptor's ModelDesc, and the other information of ModuleDescriptor can be either static or retrieved from the annotation node. The output of the annotation processing is a string result from binding the annotation template with the data. This string is appended to the \${annotations} part of the class template. Finally, the complete class is written to the specified Java source file.
+
+\section{Evaluations} \label{section5}
+The primary focus of the evaluation in this work is to assess the effectiveness of the proposed approach in meeting the SCGL requirements outlined in Section 4. To that end, we have formulated two specific questions to guide our evaluation:
+
+\textbf{EQ1}:	SCGL Evaluation: What is the extent to which SCGL correctly represent SCCL*?
+
+\textbf{EQ2}:	SPKGen Evaluation: What is the effectiveness of the SPKGen algorithm in generating the SCC* for a given SPA?
+
+\textbf{EQ3}:   SCGL's effectiveness: How effective is SCGL in generating SPA code?
+
+\textbf{EQ4}: Effectiveness of Knowledge Graph:  What are the benefits of integrating knowledge graphs in enhancing generative AI for code generation? 
+
+We have implemented SCGL and SPKGen as part of JDA and the implementation is provided online on GitHub at this address: \url{https://github.com/jdomainapp/jdm-scgl}. Our implementation uses Java and add the following third party libraries to JDA:
+\begin{itemize}
+    \item org.neo4j.driver: This Neo4j library provide a driver that helps connecting to the AuraDB and query the knowledge graph from it.
+    \item org.freemarker: This library allow creating template for the generated code file.
+\end{itemize}
+
+\subsection{SCGL Evaluation}
+To assess the effectiveness of the SCGL knowledge graph in representing the SCCL* software configuration model, we developed a systematic approach using a mapping table. This table establishes a clear correspondence between the key SCCL* concepts and their equivalent representations in the SCGL knowledge graph.
+
+\begin{table}[h!]
+\centering
+\begin{adjustbox}{minipage=\textwidth, scale=0.8}
+
+\caption{SCGL and SCCL* OOPL and Software Configuration Elements}
+\begin{tabular}{|c|c|c|}
+\hline \rowcolor[gray]{0.8}%
+\textbf{No.} & \textbf{SCGL} & \textbf{SCCL*} \\ \hline \rowcolor[gray]{0.8}%
+\multicolumn{3}{|c|}{\textbf{OOPL Elements}} \\ \hline
+1 & ``Annotation'' node type, “ATTACHED\_TO” relationship & Annotation \\ \hline
+2 & “Class” node type & Class \\ \hline
+3 & “Attribute” node type, “HAS” relationship & Attribute \\ \hline
+4 & “Method” node type, “HAS” relationship & Method \\ \hline  \rowcolor[gray]{0.8}%
+\multicolumn{3}{|c|}{\textbf{Software Configuration Elements}} \\ \hline
+5 & “RFSGenDesc” node & RFSGenDesc annotation \\ \hline
+6 & “SystemDesc” node & SystemDesc annotation \\ \hline
+7 & “ModuleDesc” node & ModuleDescriptor annotation \\ \hline
+8 & “ViewDesc” node & ViewDesc annotation \\ \hline
+9 & “ControllerDesc” node & ControllerDesc annotation \\ \hline
+10 & “DClass” node & DClass annotation \\ \hline
+11 & “DAttr” node & DAttr annotation \\ \hline
+12 & “DOpt” node & DOpt annotation \\ \hline
+\end{tabular}
+
+
+\end{adjustbox}
+\end{table}
+The key elements of SCGL are mapped to their equivalent representations in the SCCL* model. It provides a systematic way to translate the SCCL* software configuration elements into their corresponding SCGL knowledge graph representations. 
+
+The table highlights that the essential software configuration elements defined in the SCCL* model, such as Annotations, Classes, Attributes, Methods, and various specialized classes, can be accurately represented in the SCGL knowledge graph. The one-to-one correspondence between the SCGL and SCCL* concepts facilitates the translation and integration of software configuration data between the two frameworks.
+
+The table also serves as a crucial reference point for developers and researchers working with SCGL and SCCL* to ensure that the SCGL knowledge graph can effectively capture and represent the software configuration information as defined in the SCCL* model.
+
+\subsection{SPKGen Testing}
+To evaluate the effectiveness of the proposed SPKGen algorithm, we adopted the "CourseMan" example from our previous work as a benchmark. In this evaluation, we first created a SCGL model to represent the CourseMan application. We then used the SPKGen algorithm to help JDA to generate the corresponding CourseMan application implementation. 
+
+
+% \begin{minipage}[t]{0.45\textwidth}
+% \begin{multicols}{2}
+% \begin{lstcodessm}{Generated SCCCourseman}(@\hterm{@RestController}@)
+% @SystemDesc(
+% appName="Courseman",
+% splashScreenLogo = "coursemanapplogo.jpg",
+% language = Language.English,
+% dsDesc = @DSDesc(
+%     type="postgresql",
+%     dsUrl = "http://dataserver:5432/domainds",
+%     ser = "postgres", 
+%     password = "postgres",
+%     dsmType = DSM.class, 
+%     domType = DOM.class,
+%     osmType = PostgreSQLOSM.class,
+%     connType = ConnectionType.Client
+% ),
+
+% orgDesc = @OrgDesc(
+%     name = "Faculty of IT",
+%     address = "Hanoi, Vietnam", logo = "deptit.png",
+%     url = "https://swinburne-vn.edu.vn"
+% ),
+% securityDesc = @SecurityDesc(isEnabled = false),
+% setUpDesc = @SysSetUpDesc(
+%     setUpConfigType = SetUpConfig.class
+% ),
+% modules = { 
+%     ModuleMain.class, ModuleCourseModule.class, 
+%     ModuleEnrolment.class,
+%     ModuleStudent.class,
+%     ModuleAdress.class, 
+%     ModuleStudentClass.class
+% },
+% sysModules = {}
+% )
+
+% public class SCCCourseMan { }
+% \end{lstcodessm}
+% % \end{minipage}
+% % \hfill
+
+% % \begin{minipage}[t]{0.45\textwidth}
+
+% \begin{lstcodessm}{Generated Student Module}(@\hterm{@RestController}@)
+% @ModuleDesc( name="ModuleStudent", 
+% modelDesc = @ModelDesc(
+%     model = Student.class),
+% viewDesc = @ViewDesc(
+%     formTitle = "Form: Student",
+%     domainClassLabel = "Student",
+%     imageIcon = "Student.png",
+%     view = View.class,
+%     viewType = RegionType.Null,
+%     parent = RegionName.Null,
+% ), 
+% controllerDesc = @ControllerDesc(
+%     controller = ControllerBasic.class,
+%     openPolicy = OpenPolicy.l,
+%     isDataFieldStateListener = false
+% ),
+% setUpDesc = @SetUpDesc(),
+% type = ModuleType.DomainData,
+% isPrimary = false
+% )
+% public class ModuleStudent { 
+% // view configuration 
+% @AttributeDesc(label = "Student class") 
+% private String title; 
+% @AttributeDesc(label = "Id", type=JTextField.class) 
+% private int id; 
+% @AttributeDesc(label = "Name", type=JTextField.class) 
+% private String name; 
+% @AttributeDesc(label = "Gender", 
+% type=JComboField.class) 
+% private Gender gender; 
+% @AttributeDesc(label = "Dob") 
+% private Date dob; 
+% @AttributeDesc(label = "Address", type=JDataPanel.class) 
+% private Address address; 
+% @AttributeDesc(label = "Enrolments") 
+% private Collection <Enrolment> enrols; 
+% }
+% \end{lstcodessm}
+% % \end{minipage}
+% \end{multicols}
+
+% We compare the generated result with the original CourseMan (Section II. A. Listing 1, Listing 2, Figure 1). 
+Due to space restriction, we present the generated results in the extended paper \cite{ext_paper}.
+The comparison showed that the generated application support all the basic elements listed earlier in Table 1. In order for the generated SCCCourseMan to work, we added the not-yet-supported elements to the templates that are used SPKGen algorithm. We will implement these values into the knowledge graph in the future. 
+
+\subsection{SPKGen Performance}
+
+In addition to a qualitative evaluation, we conducted a time complexity analysis of the SPKGen algorithm to assess its computational efficiency and scalability. These performance characteristics are critical for the practical application of the SPKGen algorithm in real-world software development scenarios. 
+
+\begin{theorem}(\textbf{SPKGen Performance})
+The time complexity of our SPKGen algorithm is quadratic to the number of class nodes in the input graph.
+\qed
+\end{theorem}
+
+\begin{proof}
+
+Assuming the time complexity of writing to a file is $O(1)$, the overall time complexity of the SPKGen algorithm can be broken down as follows.
+
+In the first step, the algorithm queries all class nodes in the Neo4j knowledge graph. Let the number of class nodes be denoted as $n$, and the time complexity for this step is $O(n)$. Next, the algorithm loops through the list of class nodes, which also incurs a time complexity of $O(n)$. For each class node, it performs several sub-steps. First, it reads basic class information such as the name and package from the node, which is $O(1)$. Then, it checks for the existence of a “path” property, again $O(1)$. If the property exists, the class is copied from the original file (with time complexity $O(1)$), otherwise, the algorithm proceeds to generate the class. Class generation involves creating a class model object, which is $O(1)$, querying the class annotations (with time complexity $O(m)$, where $m$ represents the number of annotations), and for each annotation, creating and binding a model object to a template, also $O(m)$. Finally, the class model is bound to a template and written to the output file, with a time complexity of $O(1)$.
+
+Assuming that $k$ nodes have the “path” property, and $n - k$ nodes do not, the overall time complexity of the SPKGen algorithm is the sum of the time complexities of the individual steps, resulting in:
+
+\vspace{-0.5cm}
+\begin{equation}
+\begin{split}
+O(n) + O \left( k \cdot (1 + 1 + 1) + (n - k) \cdot (1 + m + m + 1) \right) \\
+= O(n) + O(2nm + 2n + k - 2km) \nonumber
+\end{split}
+\end{equation}
+
+
+This simplifies to $O(nm)$, which can be approximated to $O(n^2)$, since in typical software, $n$ is generally greater than $m$. 
+\qed
+\end{proof}
+
+\subsection{Effectiveness of Knowledge Graph}
+An experiment was conducted to evaluate the effectiveness of incorporating KG in the code generation process using ChatGPT. The objective was to test the hypothesis that Generative AI (GenAI) with knowledge graphs (KG-enhanced GenAI) would produce more optimized and accurate outputs compared to GenAI relying solely on natural language prompts. 
+
+\textbf{Methodology:} The experiment focused on generating frontend React code for modules including Student, Address, Course, Enrollment, and StudentClass. The generated code was tested and analyzed to identify key technical features and make comparisons. The results are available in a GitHub repository \url{https://github.com/jdomainapp/doc-scgl-soict2024}, organized into two folders: \textbf{CourseManScenario1} and \textbf{CourseManScenario2}, corresponding to the two different conditions below.
+
+\textbf{Scenario 1: Natural Language Prompts}
+ChatGPT was provided with prompts written entirely in natural language, without additional contextual information. 
+
+\textbf{Scenario 2: Knowledge Graph-Enhanced Prompts}
+This scenario extended the experiment by incorporating structured knowledge from knowledge graphs, which captured both high-level and detailed relationships between the modules.
+
+\textbf{Results:} \label{table2}
+\begin{table*}[!h]
+\centering
+\begin{adjustbox}{minipage=\textwidth, scale=0.8}
+\caption{Comparison of Scenario 1 and 2 Results}
+\begin{tabular}{|p{5cm}|>{\centering\arraybackslash}m{4cm}|>{\centering\arraybackslash}m{4cm}|} 
+\hline \rowcolor[gray]{0.8}%
+\textbf{Aspects} & \textbf{Scenario 1} & \textbf{Scenario 2} \\ \hline
+\textbf{Total Prompts Used} & 5 & 3 \\ \hline
+\textbf{Parent-child Relationships (binary)} & 0 & 1 \\ \hline
+\textbf{Code Repetition (\%)} & 15\% & 5\% \\ \hline
+\textbf{API Integration (binary)} & 0 & 1 \\ \hline
+\textbf{Modules Generated} & 6 & 8 \\ \hline
+\textbf{Validation Coverage (\%)} & 50\% & 90\% \\ \hline
+\textbf{GPT Prompts and Results} & \href{https://chatgpt.com/share/66e6c3db-085c-800f-ac85-472e3759a502}{Link to ChatGPT} & \href{https://chatgpt.com/share/f25676f5-f3a0-4035-9823-074cc7585552}{Link to ChatGPT} \\ \hline
+\textbf{GitHub Repository} & \href{https://github.com/jdomainapp/doc-scgl-soict2024/tree/main/CourseManScenario1}{Link to CourseManScenario1} & \href{https://github.com/jdomainapp/doc-scgl-soict2024/tree/main/CourseManScenario2}{Link to CourseManScenario2} \\ \hline
+\end{tabular}
+\end{adjustbox}
+\end{table*}
+
+In Scenario 1, generating complete modules required 5 iterations. The initial prompt produced incomplete fields and unclear relationships between modules, requiring a follow-up to define these relationships in natural language. Even then, ChatGPT struggled with complex structures like the parent-child relationship between Course and its subclasses. Instead of distinct modules, ChatGPT generated a form with a Course Type field, showing the limitations of project enhancement.
+
+In Scenario 2, leveraging a knowledge graph (KG) reduced the process to 3 iterations, plus one more prompt for nested forms. The code was more complete, accurately capturing complex relationships like the Course and its subclasses, reducing redundancy, and integrating API hooks for backend scalability. ChatGPT can also generate nested forms combining relevant modules like Student and Enrollment. Enhancements were easier, as the KG clarified module relationships, reducing the need for further prompts. 
+
+This experiment demonstrates that KG-enhanced GenAI provides a more powerful and efficient approach to code generation, offering better understanding, accuracy, and less manual intervention than standard GenAI. Further integrating KG into GenAI workflows could boost its effectiveness for practical applications in software development and beyond.
+
+\subsubsection{Discussion}
+
+Combining the evaluation with the results from JDA and SCGL highlights the substantial benefits of utilizing Knowledge Graphs for structuring the code generation process. While the code generated by JDA stands out for its superior user interface design compared to the GPT-generated code (see folders \href{https://github.com/jdomainapp/doc-scgl-soict2024/tree/main/CourseManJDA}{CourseManJDA} and \href{https://github.com/jdomainapp/doc-scgl-soict2024/tree/main/CourseManScenario2}{CourseManScenario2} of our GitHub repository), both approaches exhibit the strengths in terms of performance. This includes aspects such as code optimization and the volume of modules generated, as illustrated in the previous sections for JDA and Table 2 for ChatGPT.
+
+SCGL, in particular, demonstrates an advantage through its ability to represent complex relationships, which contributes to more optimized code and less repetition. This emphasizes the value of SCGL and the potential of Knowledge Graphs in enhancing the automatic code generation process, especially when dealing with large-scale projects requiring intricate system architectures. Overall, the integration of SCGL with KG enhances efficiency and potential for further applications of KG in code generation.
+
+\section{Conclusion} \label{section6}
+\vspace{-0.3cm}
+In this work, we have presented a novel approach to automating the SPAs development process by using knowledge graph technology to express software design specifications. Our key contributions are the development of a knowledge graph model (SCGL) that can capture the essential elements of SPA design, and the implementation of this model in the SPKGen module of JDA to generate SPAs based on SCGL. This framework allows domain experts to define SPA specifications using the knowledge graph, and then automatically generates the complete SPA software modules from these specifications. This work represents an important step towards bridging the gap between high-level design intent and low-level implementation details in software engineering. Future extensions could explore the integration with other AI-powered software engineering tools, as well as the application of the knowledge graph approach to additional software domains.
+
+\bibliographystyle{splncs04.bst}
+\bibliography{resfes2024, SOICT}
+\end{document}

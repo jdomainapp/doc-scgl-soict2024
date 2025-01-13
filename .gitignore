@@ -1,0 +1,40 @@
+# LaTeX temporary files
+*.aux
+*.log
+*.toc
+*.out
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+
+# BibTeX related files
+*.bbl
+*.blg
+
+# Glossaries
+*.acn
+*.acr
+*.alg
+*.glg
+*.glo
+*.gls
+*.ist
+
+# Synctex (for TeXworks and TeXshop)
+*.synctex.gz
+
+# Compiled Document
+# *.pdf
+*.dvi
+
+# Others
+*.nav
+*.snm
+*.vrb
+*.idx
+*.ilg
+*.ind
+*.maf
+*.mtc
+*.mtc0
